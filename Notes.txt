@@ -1,0 +1,15 @@
+Admin
+
+
+
+Not-Working
+1) /admin/dashboard 
+2) /admin/pie
+
+
+Working
+1) /admin/product 
+2) /admin/transaction 
+1) /admin/customer 
+1) /admin/bar
+1) /admin/line
