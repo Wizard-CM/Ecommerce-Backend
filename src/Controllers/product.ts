@@ -42,7 +42,7 @@ export const createProduct = tryCatchWrapper(
       category,
       user,
       price,
-      photo: cloudinaryResponse?.url || "abc",
+      photo: cloudinaryResponse?.url,
     });
     revalidateCache({ product: true });
 
