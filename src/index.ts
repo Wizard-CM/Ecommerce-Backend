@@ -25,10 +25,13 @@ const port = process.env.PORT;
 export const nodeCache = new NodeCache();
 export const stripe = new Stripe(STRIPE_KEY);
 
+
+
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'))
+app.use('/uploads', express.static('uploads'))
 app.use(cors());
 
 // Routes middlewares
