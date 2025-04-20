@@ -23,7 +23,6 @@ export const createProduct = tryCatchWrapper(
   async (req: Request<{}, {}, createProductRequestBody>, res, next) => {
     const { name, stock, category, user, price } = req.body;
     const photo = req.file;
-    console.log(name, stock, category, user, price, photo);
 
     if (!name || stock < 0 || !category || !user || !price) {
       return next(
@@ -31,15 +30,19 @@ export const createProduct = tryCatchWrapper(
       );
     }
 
+    console.log(photo?.path,"pathhhhhhhhhhhh")
+
     const cloudinaryResponse = await uploadOnCloudinary(photo?.path);
 
+    console.log(cloudinaryResponse,"cloudinaryResponse")
+    
     const product = await product_Model.create({
       name,
       stock,
       category,
       user,
       price,
-      photo: cloudinaryResponse?.url || "",
+      photo: cloudinaryResponse?.url || "abc",
     });
     revalidateCache({ product: true });
 

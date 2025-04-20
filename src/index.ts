@@ -1,5 +1,4 @@
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import Stripe from "stripe";
 import NodeCache from "node-cache";
@@ -14,8 +13,10 @@ import orderRouter from "./Routes/order.js";
 import chartRouter from "./Routes/chart.js";
 import paymentRouter from "./Routes/payment.js";
 
+console.log(process.env.STRIPE_KEY,"stripe key")
+console.log(process.env.MONGO_URI,"mongo URI")
+
 // dotenv setup
-dotenv.config();
 const STRIPE_KEY = process.env.STRIPE_KEY || "";
 const MONGO_URI = process.env.MONGO_URI || "";
 
