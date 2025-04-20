@@ -9,6 +9,7 @@ export const ChartCaching = async <T>({
   key,
   promise,
 }: ChartCachingProps<T>): Promise<T[]> => {
+  
   if (nodeCache.has(key)) {
     let data: T[] = nodeCache.get(key)!;
     return data;

@@ -11,7 +11,14 @@ export const createUser = tryCatchWrapper(
   async (req: Request<{}, {}, createUserRequestBody>, res, next) => {
     const { username, email, photo, dob, gender ,uid} = req.body;
     
-    //  Condition for checking if user already exist and if it exists then return
+    if (!username || !email || !dob || !gender || !uid) {
+      console.log("user Details field data is missing");
+      return next(
+        new ErrorHandler("Fill All The User's Information Field", 400)
+      );
+    }
+    
+    // Condition for checking if user already exist and if it exists then return
     const userExists = await userModel.findOne({ email,uid });
     if (userExists?.username) {
       console.log("user Already Exists");
@@ -23,12 +30,6 @@ export const createUser = tryCatchWrapper(
       });
     }
 
-    if (!username || !email || !dob || !gender || !uid) {
-      console.log("user Details field data is missing");
-      return next(
-        new ErrorHandler("Fill All The User's Information Field", 400)
-      );
-    }
 
 
     const user = await userModel.create({

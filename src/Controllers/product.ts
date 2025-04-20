@@ -1,4 +1,4 @@
-import { NextFunction ,Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { reqParamsType, tryCatchWrapper } from "../Utils/ControllerWrapper.js";
 import {
   createProductRequestBody,
@@ -9,6 +9,7 @@ import { product_Model } from "../Models/product.model.js";
 import { rm } from "fs";
 import { nodeCache } from "../index.js";
 import { revalidateCache } from "../Utils/features.js";
+import { uploadOnCloudinary } from "../Utils/Cloudinary.js";
 
 interface baseSortingQueryProps {
   price?: { $lte: number };
@@ -30,13 +31,15 @@ export const createProduct = tryCatchWrapper(
       );
     }
 
+    const cloudinaryResponse = await uploadOnCloudinary(photo?.path);
+
     const product = await product_Model.create({
       name,
       stock,
       category,
       user,
       price,
-      photo: photo?.path,
+      photo: cloudinaryResponse?.url || "",
     });
     revalidateCache({ product: true });
 
@@ -59,32 +62,41 @@ export const updateProduct = tryCatchWrapper(
     const { id } = req.params;
     const { name, stock, category, price } = req.body;
     const photo = req.file;
+    let cloudinaryResponse = null;
+
+    if (photo) {
+      cloudinaryResponse = await uploadOnCloudinary(photo?.path);
+    }
 
     const product = await product_Model.findById(id);
     if (!product)
       return next(new ErrorHandler("Product ID Does Not Match", 400));
 
     //  Deleting the old photo from the uploads folder
-    if (photo) {
-      console.log(process.cwd());
-      console.log(product.photo);
-      rm(
-        `${process.cwd()}/${product?.photo}`,
-        { recursive: true, force: true },
-        (err) => {
-          if (err) {
-            throw err;
-          }
-          console.log(`Old Photo Deleted!`);
-        }
-      );
-    }
+    // if (photo) {
+    //   console.log(process.cwd());
+    //   console.log(product.photo);
+    //   rm(`${process.cwd()}/${product?.photo}`,{ recursive: true, force: true },
+    //     (err) => {
+    //       if (err) {
+    //         throw err;
+    //       }
+    //       console.log(`Old Photo Deleted!`);
+    //     }
+    //   );
+    // }
 
     //  Updating data to the database
     await product_Model.findByIdAndUpdate(
       { _id: id },
       {
-        $set: { name, stock, category, price, photo: photo?.path },
+        $set: {
+          name,
+          stock,
+          category,
+          price,
+          photo: cloudinaryResponse?.url || product.photo,
+        },
       }
     );
 

@@ -9,6 +9,7 @@ export class ErrorHandler extends Error implements errorHandlerProps {
   constructor(message: string, statusCode: number) {
     super(message);
     this.statusCode = statusCode;
+
   }
 }
 

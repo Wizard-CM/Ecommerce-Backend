@@ -1,10 +1,13 @@
 import { NextFunction, Request, Response } from "express";
-import { createProductRequestBody, createUserRequestBody } from "../types/apiTypes.js";
+import {
+  createProductRequestBody,
+  createUserRequestBody,
+} from "../types/apiTypes.js";
 
 export interface reqParamsType {
-  id?:string,
-  cartItemId?:string,
-  productId?:string
+  id?: string;
+  cartItemId?: string;
+  productId?: string;
 }
 
 type functionType = (

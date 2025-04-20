@@ -86,6 +86,7 @@ export const updateCartItem = tryCatchWrapper(async (req, res, next) => {
     message: "CartItem Successfully Updated",
   });
 });
+
 // revalidate
 export const deleteCartItem = tryCatchWrapper(async (req, res, next) => {
   revalidateCache({ cart: true });
@@ -106,6 +107,7 @@ export const deleteCartItem = tryCatchWrapper(async (req, res, next) => {
     message: "CartItem Successfully Deleted",
   });
 });
+
 export const deleteAllCartItemOfAUser = tryCatchWrapper(
   async (req, res, next) => {
     revalidateCache({ cart: true });

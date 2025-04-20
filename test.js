@@ -1,0 +1,2 @@
+Promise.resolve(Promise.resolve("Hello my firned")).then(data => console.log('then block',data)).catch(err => console.log('catch block',err));
+// Promise.reject(Promise.resolve("Hello my firned")).then(data => console.log('then block',data)).catch(err => console.log('catch block',err));

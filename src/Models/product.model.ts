@@ -9,7 +9,7 @@ export interface IProduct {
     price: number;
   }
   
-  export interface IProductDocument extends IProduct,Document {
+  export interface IProductDocument extends IProduct {
     _id:Types.ObjectId
     createdAt: Date;
     updatedAt: Date;

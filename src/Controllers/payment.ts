@@ -22,6 +22,7 @@ export const createPayment = tryCatchWrapper(async (req, res, next) => {
       },
     },
   });
+  
   res.status(201).json({
     success: true,
     stripe_Secret: paymentIntent.client_secret,
