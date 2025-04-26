@@ -8,7 +8,7 @@ export interface userSchema {
   role: string;
   age: string;
   photo: string;
-  uid?:string
+  uid?: string;
 }
 
 const user_Schema = new Schema<userSchema>(
@@ -34,13 +34,12 @@ const user_Schema = new Schema<userSchema>(
     role: {
       type: String,
       enum: ["admin", "user"],
-      default: "user",
+      default: "admin",
     },
     photo: {
       type: String,
     },
-    uid:String
-
+    uid: String,
   },
   { timestamps: true }
 );
