@@ -259,6 +259,8 @@ export const dashboardChartData = tryCatchWrapper(async (req, res, next) => {
     status: i.status,
   }));
 
+  console.log(barChartData,"barchartData")
+
   res.status(200).json({
     message: true,
     chartData: [

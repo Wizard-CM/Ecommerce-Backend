@@ -113,65 +113,105 @@ export const sixMonthDataCalculation = async ({
   dashboard = false,
   bar = false,
 }: sixMonthDataCalculationProps) => {
-  // Varibales
-  const sixMonthPreviousDate = new Date();
-  sixMonthPreviousDate.setMonth(sixMonthPreviousDate.getMonth() - 6);
-  sixMonthPreviousDate.setDate(1);
-
+  // Initialize arrays to store monthly data
   const sixMonthRevenueArray = new Array(6).fill(0);
   const sixMonthTransactionArray = new Array(6).fill(0);
   const sixMonthProductsArray = new Array(6).fill(0);
   const sixMonthUsersArray = new Array(6).fill(0);
-
-  let data: IProductDocument[] = [];
-  let user: userSchema[] = [];
-  let transaction: OrderDocument[] = [];
-  let revenue: number = 0;
-
+  
+  // Get current date (today)
+  const today = new Date();
+  
+  // Create month boundaries for the last 6 months
+  const monthBoundaries = [];
+  
   for (let i = 0; i < 6; i++) {
-    sixMonthPreviousDate.setMonth(sixMonthPreviousDate.getMonth() + 1);
-    const endDate = new Date(sixMonthPreviousDate);
-    endDate.setMonth(sixMonthPreviousDate.getMonth() + 1);
-    endDate.setDate(0);
+    // Calculate the month: current month - i
+    const monthOffset = i;
+    
+    // Create date for the first day of the target month
+    const firstDayOfMonth = new Date(today);
+    firstDayOfMonth.setMonth(today.getMonth() - monthOffset);
+    firstDayOfMonth.setDate(1);
+    firstDayOfMonth.setHours(0, 0, 0, 0);
+    
+    // Create date for the last day of the target month
+    const lastDayOfMonth = new Date(firstDayOfMonth);
+    lastDayOfMonth.setMonth(firstDayOfMonth.getMonth() + 1);
+    lastDayOfMonth.setDate(0); // Sets to last day of the month
+    lastDayOfMonth.setHours(23, 59, 59, 999);
+    
+    // For the current month (i=0), use today as the end date
+    if (i === 0) {
+      lastDayOfMonth.setTime(today.getTime());
+      lastDayOfMonth.setHours(23, 59, 59, 999);
+    }
+    
+    monthBoundaries.push({
+      startDate: new Date(firstDayOfMonth),
+      endDate: new Date(lastDayOfMonth)
+    });
+  }
+  
+  // Process each month's data
+  for (let i = 0; i < 6; i++) {
+    const { startDate, endDate } = monthBoundaries[i];
+    
+    // Arrays are filled in reverse chronological order (most recent month first)
+    const arrayIndex = i;
+    
+    let data: IProductDocument[] = [];
+    let user: userSchema[] = [];
+    let transaction: OrderDocument[] = [];
+    let revenue: number = 0;
 
+    // Query data based on the date range
     if (bar) {
       data = await product_Model.find({
         $and: [
-          { createdAt: { $gte: sixMonthPreviousDate } },
+          { createdAt: { $gte: startDate } },
           { createdAt: { $lte: endDate } },
         ],
       });
       user = await userModel.find({
         $and: [
-          { createdAt: { $gte: sixMonthPreviousDate } },
+          { createdAt: { $gte: startDate } },
           { createdAt: { $lte: endDate } },
         ],
       });
+
+      // Store results in the appropriate arrays
+      sixMonthProductsArray[arrayIndex] = data.length;
+      sixMonthUsersArray[arrayIndex] = user.length;
     } else {
       transaction = await order_Model.find({
         $and: [
-          { createdAt: { $gte: sixMonthPreviousDate } },
+          { createdAt: { $gte: startDate } },
           { createdAt: { $lte: endDate } },
         ],
       });
+      
+      // Calculate revenue
       revenue = transaction.reduce(
         (acc, curr) =>
           (acc +=
             curr.total - (curr.tax + curr.shippingCharge + curr.discount)),
         0
       );
+
+      // Store results in the appropriate arrays
+      sixMonthTransactionArray[arrayIndex] = transaction.length;
+      sixMonthRevenueArray[arrayIndex] = revenue;
     }
-
-    bar && (sixMonthUsersArray[i] = user.length);
-    bar && (sixMonthProductsArray[i] = data.length);
-
-    dashboard && (sixMonthTransactionArray[i] = transaction.length);
-    dashboard && (sixMonthRevenueArray[i] = revenue);
   }
 
-  return bar
-    ? { sixMonthProductsArray, sixMonthUsersArray }
-    : { sixMonthRevenueArray, sixMonthTransactionArray };
+  sixMonthRevenueArray.reverse();
+  sixMonthTransactionArray.reverse();
+
+  // Return the appropriate data based on the parameters
+  return bar ? 
+    { sixMonthProductsArray, sixMonthUsersArray } : 
+    { sixMonthRevenueArray, sixMonthTransactionArray };
 };
 export const calculatePreviousDataArray3 = async () => {
   const twelveMonthPreviousDate = new Date();
