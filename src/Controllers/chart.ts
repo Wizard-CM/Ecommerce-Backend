@@ -29,12 +29,7 @@ export const dashboardChartData = tryCatchWrapper(async (req, res, next) => {
   //  ----------------------Order Data for Revenue Calculation and Transaction Calculation ----------------------//
 
   const currentMonthOrderPromise = order_Model
-    .find({
-      $and: [
-        { createdAt: { $gte: currentMonthObject.start } },
-        { createdAt: { $lte: currentMonthObject.end } },
-      ],
-    })
+    .find()
     .select(["total", "tax", "shippingCharge", "discount", "status"]);
 
   const previousMonthOrderPromise = order_Model
@@ -147,22 +142,22 @@ export const dashboardChartData = tryCatchWrapper(async (req, res, next) => {
   }, 0);
 
   //------------------------------------------Percentage Calculation----------------------------------------------------//
-  const revenuePercentage = calculatePercentage(
-    currentMonthRevenue!,
-    previousMonthRevenue
-  );
-  const userPercentage = calculatePercentage(
-    currentMonthUsers.length,
-    previousMonthUsers.length
-  );
-  const productPercentage = calculatePercentage(
-    currentMonthProducts.length,
-    previousMonthProducts.length
-  );
-  const transactionPercentage = calculatePercentage(
-    currentMonthOrder!.length,
-    previousMonthOrder.length
-  );
+  // const revenuePercentage = calculatePercentage(
+  //   currentMonthRevenue!,
+  //   previousMonthRevenue
+  // );
+  // const userPercentage = calculatePercentage(
+  //   currentMonthUsers.length,
+  //   previousMonthUsers.length
+  // );
+  // const productPercentage = calculatePercentage(
+  //   currentMonthProducts.length,
+  //   previousMonthProducts.length
+  // );
+  // const transactionPercentage = calculatePercentage(
+  //   currentMonthOrder!.length,
+  //   previousMonthOrder.length
+  // );
   //------------------------------------------Category Percentage Calculation------------------------------------------//
   const categoryObject: Record<string, number> = {};
   const totalProductsLength = allProduct.length;
@@ -236,16 +231,16 @@ export const dashboardChartData = tryCatchWrapper(async (req, res, next) => {
   // ------------------------------------------------------Data Objects ------------------------------------------------------//
   const topWidgetValues = {
     revenue: currentMonthRevenue,
-    users: currentMonthUsers.length,
-    products: currentMonthProducts.length,
+    users: allUsers,
+    products: allProduct.length,
     transactions: currentMonthOrder?.length,
   };
-  const topWidgetPercentage = {
-    revenuePercentage,
-    userPercentage,
-    productPercentage,
-    transactionPercentage,
-  };
+  // const topWidgetPercentage = {
+  //   revenuePercentage,
+  //   userPercentage,
+  //   productPercentage,
+  //   transactionPercentage,
+  // };
 
   const products = await product_Model.find();
 
@@ -267,7 +262,7 @@ export const dashboardChartData = tryCatchWrapper(async (req, res, next) => {
   res.status(200).json({
     message: true,
     chartData: [
-      topWidgetPercentage,
+      // topWidgetPercentage,
       topWidgetValues,
       categoryObject,
       genderRatioObject,
