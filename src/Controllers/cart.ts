@@ -30,14 +30,19 @@ export const singleUserCartItems = tryCatchWrapper(async (req, res, next) => {
 export const addToCart = tryCatchWrapper(async (req, res, next) => {
   const { productId, userId } = req.body;
   console.log(productId);
-  revalidateCache({ cart: true, id: userId });
 
-  const cartItemExists = await cart_Model.findOne({ product: productId });
+  const cartItemExists = await cart_Model.findOne({
+    $and: [
+      { product: productId },
+      { user: userId },
+      // Add more conditions as needed
+    ],
+  });
   // console.log(cartItemExists.length >= 1)
   if (cartItemExists?._id) {
     cartItemExists.quantity = cartItemExists.quantity + 1;
     await cartItemExists.save();
-    revalidateCache({ cart: true, id: userId });
+
     return res.status(201).json({
       success: true,
       message: "Cart Quantity Successfully Updated",
